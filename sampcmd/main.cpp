@@ -58,5 +58,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 		else
 			ret = GetLastError();
 	}
+	else
+		ret = GetLastError();
 	return ret;
 }
