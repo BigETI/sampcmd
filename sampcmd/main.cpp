@@ -12,15 +12,11 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	HMODULE mh(GetModuleHandleW(L"kernel32.dll"));
 	FARPROC pa;
 	LPVOID ptr;
-	PROCESS_INFORMATION process_info;
-	STARTUPINFOW startup_info;
+	PROCESS_INFORMATION process_info = { 0 };
+	STARTUPINFOW startup_info = { 0 };
 	HANDLE rt;
-	wstring_convert<codecvt_utf8_utf16<wchar_t>> converter;
-	wstring curr_dir, samp_dll, gta_sa_exe, params(converter.from_bytes(lpCmdLine));
-	memset(&process_info, 0, sizeof(PROCESS_INFORMATION));
-	memset(&startup_info, 0, sizeof(STARTUPINFOW));
-	wchar_t cd[MAX_PATH + 1];
-	memset(cd, 0, (MAX_PATH + 1) * sizeof(wchar_t));
+	wstring curr_dir, samp_dll, gta_sa_exe;
+	wchar_t cd[MAX_PATH + 1] = { 0 };
 	GetCurrentDirectoryW(MAX_PATH, cd);
 	curr_dir = cd;
 	samp_dll = curr_dir + L"\\samp.dll";
@@ -30,7 +26,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 		pa = GetProcAddress(mh, "LoadLibraryW");
 		if (pa)
 		{
-			if (CreateProcessW(gta_sa_exe.c_str(), const_cast<LPWSTR>(params.c_str()), nullptr, nullptr, false, DETACHED_PROCESS | CREATE_SUSPENDED, nullptr, nullptr, &startup_info, &process_info))
+			if (CreateProcessW(gta_sa_exe.c_str(), GetCommandLineW(), nullptr, nullptr, false, DETACHED_PROCESS | CREATE_SUSPENDED, nullptr, nullptr, &startup_info, &process_info))
 			{
 				ptr = VirtualAllocEx(process_info.hProcess, nullptr, (samp_dll.length() + 1) * sizeof(wchar_t), MEM_RESERVE | MEM_COMMIT, PAGE_EXECUTE_READWRITE);
 				if (ptr)
