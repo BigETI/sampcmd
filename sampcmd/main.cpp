@@ -1,7 +1,5 @@
 #include "resource.h"
 #include <Windows.h>
-#include <locale>
-#include <codecvt>
 #include <string>
 
 using namespace std;
