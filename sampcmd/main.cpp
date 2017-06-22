@@ -16,8 +16,9 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	string curr_dir, samp_dll, gta_sa_exe;
 	memset(&process_info, 0, sizeof(PROCESS_INFORMATION));
 	memset(&startup_info, 0, sizeof(STARTUPINFOA));
-	char cd[512];
-	GetCurrentDirectoryA(512, cd);
+	char cd[MAX_PATH + 1];
+	memset(cd, 0, (MAX_PATH + 1) * sizeof(char));
+	GetCurrentDirectoryA(MAX_PATH, cd);
 	curr_dir = cd;
 	samp_dll = curr_dir + "\\samp.dll";
 	gta_sa_exe = curr_dir + "\\gta_sa.exe";
