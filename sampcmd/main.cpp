@@ -4,6 +4,31 @@
 
 using namespace std;
 
+/// <summary>
+/// Get last error message
+/// </summary>
+/// <returns>Error message</returns>
+static wstring GetErrorMessage(DWORD error)
+{
+	wstring ret;
+	if (error != NO_ERROR)
+	{
+		LPWSTR buffer = nullptr;
+		size_t size = FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, nullptr, error, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), reinterpret_cast<LPWSTR>(&buffer), 0, nullptr);
+		ret = wstring(buffer, size);
+		LocalFree(buffer);
+	}
+	return ret;
+}
+
+/// <summary>
+/// Main entry point
+/// </summary>
+/// <param name="hInstance">Instance handle</param>
+/// <param name="hPrevInstance">Previous instance handle</param>
+/// <param name="lpCmdLine">Command line</param>
+/// <param name="nCmdShow">Command show</param>
+/// <returns>Exit code</returns>
 int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
 	int ret(0);
@@ -14,9 +39,9 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	STARTUPINFOW startup_info = { 0 };
 	HANDLE rt;
 	wstring curr_dir, samp_dll, gta_sa_exe;
-	wchar_t cd[MAX_PATH + 1] = { 0 };
-	GetCurrentDirectoryW(MAX_PATH, cd);
-	curr_dir = cd;
+	curr_dir.resize(FILENAME_MAX);
+	DWORD sz = GetCurrentDirectoryW(FILENAME_MAX, &(curr_dir[0]));
+	curr_dir.resize(sz);
 	samp_dll = curr_dir + L"\\samp.dll";
 	gta_sa_exe = curr_dir + L"\\gta_sa.exe";
 	if (mh)
@@ -38,24 +63,41 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 							WaitForSingleObject(rt, INFINITE);
 						}
 						else
+						{
 							ret = GetLastError();
+						}
 					}
 					else
+					{
 						ret = GetLastError();
+					}
 					VirtualFreeEx(process_info.hProcess, ptr, 0, MEM_RELEASE);
 				}
 				else
+				{
 					ret = GetLastError();
+				}
 				ResumeThread(process_info.hThread);
 				CloseHandle(process_info.hProcess);
 			}
 			else
+			{
 				ret = GetLastError();
+			}
 		}
 		else
+		{
 			ret = GetLastError();
+		}
 	}
 	else
+	{
 		ret = GetLastError();
+	}
+	if (ret != NO_ERROR)
+	{
+		wstring error(GetErrorMessage(ret));
+		MessageBoxW(nullptr, error.c_str(), L"Error", MB_ICONERROR | MB_OK);
+	}
 	return ret;
 }
